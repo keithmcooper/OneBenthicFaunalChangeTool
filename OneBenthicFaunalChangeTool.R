@@ -37,6 +37,7 @@ library(ggh4x)
 #write.csv(object,'filename.csv', row.names=F)
 
 ## Stop error
+
 sf_use_s2(FALSE)
 #__________________________________________________________________________________________
 #### CODE TO SOLVE ERROR: Missing dbQuoteLiteral methods for pool' ####
