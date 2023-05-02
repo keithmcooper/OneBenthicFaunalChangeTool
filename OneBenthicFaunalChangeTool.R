@@ -1325,7 +1325,7 @@ order by s.year desc, st.stationcode asc; ",
     ## Produce plot
     #en_coord_cont = as.data.frame(scores(en, "vectors")) * ordiArrowMul(en)
     
-    p <-  ggplot(data = data.scores2, aes(x = NMDS1, y = NMDS2, col=time)) + 
+    p <-  ggplot(data = data.scores2, aes(x = sites.NMDS1, y = sites.NMDS2, col=time)) + 
       geom_point(data = data.scores2, size = 1.8, alpha =0.6) +
       scale_colour_manual(values = c("blue","#00CCCC"))+
       annotate(geom="text", x=0, y=1, label=paste("Stress=",stress))+
@@ -1379,7 +1379,7 @@ order by s.year desc, st.stationcode asc; ",
     ## Produce plot
     #en_coord_cont = as.data.frame(scores(en, "vectors")) * ordiArrowMul(en)
     
-    p <-  ggplot(data = data.scores2, aes(x = NMDS1, y = NMDS2, col=time)) + 
+    p <-  ggplot(data = data.scores2, aes(x = sites.NMDS1, y = sites.NMDS2, col=time)) + 
       geom_point(data = data.scores2, size = 1.8, alpha =0.6) +
       scale_colour_manual(values = c("blue","#00CCCC"))+
       annotate(geom="text", x=0.5, y=1, label=paste("Stress=",stress))+
@@ -1426,14 +1426,14 @@ order by s.year desc, st.stationcode asc; ",
     
     ##Bind results of ordination to data (so you have access to factors etc)
     data.scores2 <- cbind(data,data.scores)
-    
+    View(data.scores2)
     ## Make a df for your subset with coordinates and time
     #data.scores.site = as.data.frame(data.scores3[,c(17:19,12)])
     
     ## Produce plot
     #en_coord_cont = as.data.frame(scores(en, "vectors")) * ordiArrowMul(en)
     
-    p <-  ggplot(data = data.scores2, aes(x = NMDS1, y = NMDS2, col=time)) + 
+    p <-  ggplot(data = data.scores2, aes(x = sites.NMDS1, y = sites.NMDS2, col=time)) + 
       geom_point(data = data.scores2, size = 1.8, alpha =0.6) +
       scale_colour_manual(values = c("blue","#00CCCC"))+
       #annotate(geom="text", x=0.5, y=1, label=paste("Stress=",stress))+
