@@ -1426,7 +1426,8 @@ order by s.year desc, st.stationcode asc; ",
     
     ##Bind results of ordination to data (so you have access to factors etc)
     data.scores2 <- cbind(data,data.scores)
-    View(data.scores2)
+    #View(data.scores2)
+    
     ## Make a df for your subset with coordinates and time
     #data.scores.site = as.data.frame(data.scores3[,c(17:19,12)])
     
@@ -1483,7 +1484,8 @@ order by s.year desc, st.stationcode asc; ",
     ## Subset data for PIZ
     # data.piz <- data.scores2[which(data.scores2$treatment2=='PIZ'),]#today
     data.piz <- data.scores2
-    View(data.piz)
+    #View(data.piz)
+    
     ## Number of levels in treatment3
     treat3nlevs <- nlevels(data.piz$treatment3)
     
