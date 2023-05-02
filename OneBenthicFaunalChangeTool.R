@@ -17,7 +17,7 @@ library(pool)
 library(sp)
 library(RPostgreSQL)
 library(glue)
-library(postGIStools)
+#library(postGIStools)
 library(reshape2)
 library(sf)
 library(dplyr)
@@ -1483,7 +1483,7 @@ order by s.year desc, st.stationcode asc; ",
     ## Subset data for PIZ
     # data.piz <- data.scores2[which(data.scores2$treatment2=='PIZ'),]#today
     data.piz <- data.scores2
-    
+    View(data.piz)
     ## Number of levels in treatment3
     treat3nlevs <- nlevels(data.piz$treatment3)
     
@@ -1491,7 +1491,7 @@ order by s.year desc, st.stationcode asc; ",
     cols <- rep(c('blue','#00CCCC'), (treat3nlevs/2))
     
     ## Plot
-    fig.piz <- plot_ly(data.piz, x = ~NMDS1, y = ~NMDS2, z = ~NMDS3, color = ~treatment3,colors = cols,text = ~paste('Station Code: ', stationcode),hoverinfo = "text")
+    fig.piz <- plot_ly(data.piz, x = ~sites.NMDS1, y = ~sites.NMDS2, z = ~sites.NMDS3, color = ~treatment3,colors = cols,text = ~paste('Station Code: ', stationcode),hoverinfo = "text")
     fig.piz <- fig.piz %>% add_markers()
     fig.piz <- fig.piz %>% layout(scene = list(xaxis = list(title = 'NMDS1'),
                                                yaxis = list(title = 'NMDS2'),
