@@ -31,6 +31,8 @@ library(shinycssloaders) #https://stackoverflow.com/questions/49488228/how-to-sh
 library(shinybusy)
 library(ggh4x)
 #library(geojsonio)
+library(leaflet.minicharts)
+library(magrittr)
 
 ## For problem solving
 #setwd("C:/Users/kmc00/OneDrive - CEFAS/working")
@@ -348,7 +350,8 @@ ui <- fluidPage(
                         tabPanel("Baseline",br(),div(DT::dataTableOutput("widebas"),style = 'font-size:85%')),
                         tabPanel("Monitoring",br(),div(DT::dataTableOutput("widemon"),style = 'font-size:85%')),
                         tabPanel("All",br(),div(DT::dataTableOutput("wideall"),style = 'font-size:85%')),
-                        tabPanel("All+Treatment",br(),div(DT::dataTableOutput("refst"),style = 'font-size:85%'))
+                        tabPanel("All+Treatment",br(),div(DT::dataTableOutput("refst"),style = 'font-size:85%')),
+                        tabPanel("Bar",withSpinner(leafletOutput("map2",width = "100%", height = 765)))
                       )# close tabsetPanel
              ),#close tabPanel "Data"
              #__________________________________________________________________________________________
@@ -631,6 +634,43 @@ ORDER by ss.survey_surveyname, s.samplecode;",
     DT::datatable(layer, options = list(pageLength = 9),escape=FALSE)
   )
   #__________________________________________________________________________________________  
+  #### PIE CART MAP ####
+  output$map2 <- renderLeaflet({
+    colors = c("#576169","#D0755C")#"#798187","#929489","#EEE9DE","#EBCEB1",,"#88352B"
+    ## Basic map
+    leaflet() %>%
+      addProviderTiles(providers$Esri.WorldGrayCanvas,options = providerTileOptions(noWrap = TRUE))%>%
+      addMinicharts(
+        longalltest2()$stationlong, longalltest2()$stationlat,
+        chartdata = select(longalltest2(),richness, 'abundance (sqrt)'),
+        type = "auto",
+        time = longalltest2()$time,
+        colorPalette = colors,
+        width = 25, height = 35)%>%
+      
+      addPolygons(data=owf,color = "#444444", weight = 1, smoothFactor = 0.5,group = "owf",popup = paste0("<b>Name: </b>", owf$name_prop, "<br>","<b>Status: </b>", owf$inf_status))%>%
+      addPolygons(data=owf_cab,color = "#444444", weight = 1, smoothFactor = 0.5,group = "owf_cab",popup = paste0("<b>Name: </b>", owf_cab$name_prop, "<br>","<b>Status: </b>", owf_cab$infra_stat))%>%
+      addPolygons(data=R4_chara,color = "#444444", weight = 1, smoothFactor = 0.5,group = "R4_chara",popup = paste0("<b>Name: </b>", R4_chara$name))%>%
+      addPolygons(data=R4_bid,color = "#444444", weight = 1, smoothFactor = 0.5,group = "R4_bid",popup = paste0("<b>Name: </b>", R4_bid$name, "<br>","<b>Status: </b>", R4_bid$bidding_ar))%>%
+      addPolygons(data=piz,color = "#444444", fillOpacity = 0,weight = 2, smoothFactor = 0.5,group = "agg (PIZ)",popup = paste0("<b>PIZ Area: </b>", piz$area))%>%
+      addPolygons(data=siz,color = "#444444", fillOpacity = 0, weight = 1, smoothFactor = 0.5,group = "agg (SIZ)",popup = paste0("<b>SIZ Area: </b>", siz$area))%>%
+      addPolygons(data=ref,color = "#444444", fillOpacity = 0,weight = 1, smoothFactor = 0.5,group = "ref",popup = paste0("<b>Name: </b>", ref$area))%>%
+      addPolygons(data=disp,color = "#444444", weight = 1, smoothFactor = 0.5,group = "disp",popup = paste0("<b>Name: </b>", disp$name_, "<br>","<b>Number: </b>", disp$site_))%>%
+      addPolygons(data=wave,color = "#444444", weight = 1, smoothFactor = 0.5,group = "wave",popup = paste0("<b>Name: </b>", wave$name_prop, "<br>","<b>Status: </b>", wave$inf_status))%>%
+      addPolygons(data=wave_cab,color = "#444444", weight = 1, smoothFactor = 0.5,group = "wave_cab",popup = paste0("<b>Name: </b>", wave_cab$name_prop, "<br>","<b>Status: </b>", wave_cab$infra_stat))%>%
+      addPolygons(data=tidal,color = "#444444", weight = 1, smoothFactor = 0.5,group = "tidal",popup = paste0("<b>Name: </b>", tidal$name_prop, "<br>","<b>Status: </b>", tidal$inf_statUS))%>%
+      addPolygons(data=tidal_cab,color = "#444444", weight = 1, smoothFactor = 0.5,group = "tidal_cab",popup = paste0("<b>Name: </b>", tidal_cab$name_prop, "<br>","<b>Status: </b>", tidal_cab$infra_stat))%>%
+      addPolygons(data=mcz,color = "#444444", weight = 1, smoothFactor = 0.5,group = "mcz",popup = paste0("<b>Name: </b>", mcz$site_name))%>%
+      addPolygons(data=sac,color = "#444444", weight = 1, smoothFactor = 0.5,group = "sac",popup = paste0("<b>Name: </b>", sac$site_name))%>%
+      addPolygons(data=ncmpa,color = "#444444", weight = 1, smoothFactor = 0.5,group = "ncmpa",popup = paste0("<b>Name: </b>", ncmpa$site_name))%>%
+      addPolygons(data=randd,color = "#444444", weight = 5, smoothFactor = 0.5,group = "randd")%>%
+      addPolygons(data=oga,color = "#444444", weight = 1, smoothFactor = 0.5,group = "oga",popup = paste0("<b>Number: </b>", oga$licref, "<br>","<b>Organisation: </b>", oga$licorggrp))%>%
+      addCircleMarkers(data = points,~Longitude,~Latitude,group = "samples",popup = ~paste("<b>Sample Code: </b>",Samplecode, "<br>","<b>Survey: </b>", Survey),radius =0.9,color = "grey",stroke = FALSE, fillOpacity = 0.5)%>%
+      addLayersControl(
+        overlayGroups = c("owf","owf_cab","R4_chara","R4_bid","agg (PIZ)","agg (SIZ)","ref","disp","wave","wave_cab","tidal","tidal_cab","oga","mcz","sac","ncmpa","randd","samples"),options = layersControlOptions(collapsed = TRUE))%>%hideGroup(c("owf","owf_cab","R4_chara","R4_bid","agg (SIZ)","agg (PIZ)","ref","disp","wave","wave_cab","tidal","tidal_cab","oga","mcz","sac","ncmpa","randd","samples"))%>%
+      setView(-3,54.6,zoom=5.5)
+  })
+  #__________________________________________________________________________________________  
   #### MAP ####
   
   output$map <- renderLeaflet({
@@ -651,9 +691,9 @@ ORDER by ss.survey_surveyname, s.samplecode;",
       addPolygons(data=owf_cab,color = "#444444", weight = 1, smoothFactor = 0.5,group = "owf_cab",popup = paste0("<b>Name: </b>", owf_cab$name_prop, "<br>","<b>Status: </b>", owf_cab$infra_stat))%>%
       addPolygons(data=R4_chara,color = "#444444", weight = 1, smoothFactor = 0.5,group = "R4_chara",popup = paste0("<b>Name: </b>", R4_chara$name))%>%
       addPolygons(data=R4_bid,color = "#444444", weight = 1, smoothFactor = 0.5,group = "R4_bid",popup = paste0("<b>Name: </b>", R4_bid$name, "<br>","<b>Status: </b>", R4_bid$bidding_ar))%>%
+      addPolygons(data=piz,color = "#444444", fillOpacity = 0,weight = 2, smoothFactor = 0.5,group = "agg (PIZ)",popup = paste0("<b>PIZ Area: </b>", piz$area))%>%
       addPolygons(data=siz,color = "#444444", fillOpacity = 0, weight = 1, smoothFactor = 0.5,group = "agg (SIZ)",popup = paste0("<b>SIZ Area: </b>", siz$area))%>%
       addPolygons(data=ref,color = "#444444", fillOpacity = 0,weight = 1, smoothFactor = 0.5,group = "ref",popup = paste0("<b>Name: </b>", ref$area))%>%
-      addPolygons(data=piz,color = "#444444", fillOpacity = 0,weight = 2, smoothFactor = 0.5,group = "agg (PIZ)",popup = paste0("<b>PIZ Area: </b>", piz$area))%>%
       addPolygons(data=disp,color = "#444444", weight = 1, smoothFactor = 0.5,group = "disp",popup = paste0("<b>Name: </b>", disp$name_, "<br>","<b>Number: </b>", disp$site_))%>%
       addPolygons(data=wave,color = "#444444", weight = 1, smoothFactor = 0.5,group = "wave",popup = paste0("<b>Name: </b>", wave$name_prop, "<br>","<b>Status: </b>", wave$inf_status))%>%
       addPolygons(data=wave_cab,color = "#444444", weight = 1, smoothFactor = 0.5,group = "wave_cab",popup = paste0("<b>Name: </b>", wave_cab$name_prop, "<br>","<b>Status: </b>", wave_cab$infra_stat))%>%
@@ -666,7 +706,7 @@ ORDER by ss.survey_surveyname, s.samplecode;",
       addPolygons(data=oga,color = "#444444", weight = 1, smoothFactor = 0.5,group = "oga",popup = paste0("<b>Number: </b>", oga$licref, "<br>","<b>Organisation: </b>", oga$licorggrp))%>%
       addCircleMarkers(data = points,~Longitude,~Latitude,group = "samples",popup = ~paste("<b>Sample Code: </b>",Samplecode, "<br>","<b>Survey: </b>", Survey),radius =0.9,color = "grey",stroke = FALSE, fillOpacity = 0.5)%>%
       addLayersControl(
-        overlayGroups = c("owf","owf_cab","R4_chara","R4_bid","agg (SIZ)","agg (PIZ)","ref","disp","wave","wave_cab","tidal","tidal_cab","oga","mcz","sac","ncmpa","randd","samples"),options = layersControlOptions(collapsed = FALSE))%>%hideGroup(c("owf","owf_cab","R4_chara","R4_bid","agg (SIZ)","agg (PIZ)","ref","disp","wave","wave_cab","tidal","tidal_cab","oga","mcz","sac","ncmpa","randd","samples"))%>%
+        overlayGroups = c("owf","owf_cab","R4_chara","R4_bid","agg (PIZ)","agg (SIZ)","ref","disp","wave","wave_cab","tidal","tidal_cab","oga","mcz","sac","ncmpa","randd","samples"),options = layersControlOptions(collapsed = FALSE))%>%hideGroup(c("owf","owf_cab","R4_chara","R4_bid","agg (SIZ)","agg (PIZ)","ref","disp","wave","wave_cab","tidal","tidal_cab","oga","mcz","sac","ncmpa","randd","samples"))%>%
       addDrawToolbar(polylineOptions = F, circleOptions = F, markerOptions = F,circleMarkerOptions = F, polygonOptions = F, singleFeature=TRUE)%>%
       #setView(-3,54.6,zoom=5.5)
       setView(-0.5705,54.329,zoom=6)
@@ -739,7 +779,9 @@ s.samplelat,
 w.validname,
 ts.abund,
 ts.taxaqual_qualifier,
-w.include
+w.include,
+st.stationlong,
+st.stationlat
 
 FROM 
 samples.sample as s
@@ -890,6 +932,34 @@ order by s.year desc, st.stationcode asc; ",
     
     df3 <- df2[,1:length(df2)-1]#1:13
     return(df3)
+    
+  })
+  #_________________________________________________________________________________________  
+  #### DATA FOR USE WITH PIE CHARTS (DATA) ####
+  
+  longalltest2 <- reactive({
+    
+    df2<- longall() %>% 
+      filter(if (input$paired == TRUE) match == TRUE else !is.na(match))
+    
+    df3 <- df2[,1:ncol(df2)]
+    
+    ## Get stationcode, stationlong and stationlat
+    stcoord <- distinct(coord()[,c(2,11,12)])
+    
+    ## Add station coordinates to df4 (common coordinates required for use with minicharts animation)
+    library(dplyr)
+    df4 <- left_join(df3,stcoord, by="stationcode")
+    
+    ## Calculate univariate summary measures based on faunal abundance data in df4
+    library(vegan)
+    df4$richness = specnumber(df4[,6:as.numeric(length(df4)-4)]) # Species Richness(S)
+    df4$'abundance (sqrt)' = sqrt(rowSums(df4[,6:as.numeric(length(df4)-5)])) # S
+    
+    ## Select cols: stationcode, stationlong, stationlat, time, richness, abundance
+    df5 <- df4[,c(2,698,699,696,700,701)]
+    # browser()
+    return(df5)
     
   })
   #_________________________________________________________________________________________  
