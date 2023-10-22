@@ -957,8 +957,9 @@ order by s.year desc, st.stationcode asc; ",
     df4$'abundance (sqrt)' = sqrt(rowSums(df4[,6:as.numeric(length(df4)-5)])) # S
     
     ## Select cols: stationcode, stationlong, stationlat, time, richness, abundance
-    df5 <- df4[,c(2,698,699,696,700,701)]
-    # browser()
+    #df5 <- df4[,c(2,698,699,696,700,701)]
+    df5 <- df4[,c("stationcode", "stationlong", "stationlat", "time", "richness", "abundance (sqrt)")]
+     #browser()
     return(df5)
     
   })
