@@ -437,9 +437,16 @@ https://CRAN.R-project.org/package=vegan", "vegan"),"package. Where ANOSIM finds
                         #### MAP LAYERS TAB ###
                         tabPanel("Map Layers",br(),DT::dataTableOutput("activitytable"),style = 'font-size:85%'),
                         #__________________________________________________________________________________________
+                        #### RSMP TAB ####
+                        #tabPanel("RSMP"),
+                        
+                        #__________________________________________________________________________________________
                         #### FUNDERS TAB ####
-                        tabPanel("Funders",br(),tags$b("OneBenthic"),"apps are free to use but not to run. If you found the app useful then please consider joining existing funders to support the initiative. Thankyou!",br(),(img(src="logos.png",height = 375, width = 750)),style = 'font-size:90%')
-                      )
+                         tabPanel("Funders",br(),tags$b("OneBenthic"),"apps are free to use but not to run. If you found the app useful then please consider joining existing funders to support the initiative. Thankyou!",br(),(img(src="logos.png",height = 375, width = 750)),style = 'font-size:90%')
+                        
+                        #__________________________________________________________________________________________
+                        ),
+                      
              ),
              #__________________________________________________________________________________________
              #### SEARCH TAB ####
@@ -873,7 +880,7 @@ order by s.year desc, st.stationcode asc; ",
     colnames(long)[3] <- "Long"
     colnames(long)[4] <- "Lat"
     colnames(long)[5] <- "Survey Name"
-    
+    #browser()
     #DT::datatable(long()[,c(1:5,12,9,11,7,8,10,6)],class = "display nowrap",options = list(pageLength = 19,language = list(zeroRecords = "Data not publicly available")))%>%formatRound(columns=c("cG", "mG","fG","cS","mS","fS","SC"), digits=1) 
     # DT::datatable(long()[,1:length(long())-1])
     # DT::datatable(long()[,1:length(long())-1],class = "display nowrap",options = list(scrollX = TRUE,pageLength = 19,language = list(zeroRecords = "Data not publicly available")))
@@ -898,6 +905,7 @@ order by s.year desc, st.stationcode asc; ",
                                                                                         
     ))
   })
+ 
   #__________________________________________________________________________________________
   #### ALL DATA: PAIRED SAMPLES #### 
   
@@ -921,8 +929,9 @@ order by s.year desc, st.stationcode asc; ",
     ## Now join the baseline df to the monitoring df
     testab=rbind(long.paired,longmon.paired)
     longall2 <- testab
-    
+    #browser()
     return(longall2)
+    
   })
   
   longalltest <- reactive({
